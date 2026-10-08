@@ -1,0 +1,395 @@
+/* =====================================================================
+   stile.css — foglio di stile condiviso per tutte le pagine del corso
+   Font: IBM Plex Sans / IBM Plex Mono (caricati con <link> nell'HTML)
+   Struttura tipica di una pagina:
+     <header class="hero"><div class="inner"> … </div></header>
+     <section [class="alt"]><div class="inner"> … </div></section>
+     <footer> … </footer>
+   ===================================================================== */
+
+/* ---------- Variabili ---------- */
+:root {
+  --paper: #f6f4ee;
+  --paper-dim: #eeebe1;
+  --ink: #15213b;
+  --ink-soft: #4a5468;
+  --blue: #2f6fed;
+  --blue-dim: #dbe6fd;
+  --teal: #1f8f7d;
+  --teal-dim: #d9efe9;
+  --amber: #d98c1f;
+  --amber-dim: #f8e6c8;
+  --red: #c4432c;
+  --red-dim: #fbe4de;
+  --line: #d9d4c6;
+  --radius: 2px;
+  --maxw: 1000px;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+}
+
+code, .mono { font-family: var(--font-mono); }
+
+h1, h2, h3 { font-weight: 600; margin: 0 0 .4em 0; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.1rem; margin-top: 1.8em; }
+p  { margin: 0 0 1em 0; max-width: 70ch; }
+a  { color: var(--blue); }
+
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* ---------- Layout ---------- */
+.inner { max-width: var(--maxw); margin: 0 auto; }
+
+header.hero,
+section {
+  padding: 3.5em 1.5em;
+  border-bottom: 1px solid var(--line);
+}
+section.alt { background: var(--paper-dim); }
+
+header.hero { padding-top: 4em; padding-bottom: 3em; }
+header.hero .eyebrow {
+  font-family: var(--font-mono);
+  color: var(--blue);
+  font-size: .85rem;
+  margin-bottom: 1em;
+}
+header.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 1.1;
+  max-width: 20ch;
+}
+header.hero .sub {
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  max-width: 60ch;
+}
+.hero-meta {
+  display: flex; gap: 2em; margin-top: 2em; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: .85rem; color: var(--ink-soft);
+}
+.hero-meta div span {
+  display: block; color: var(--ink); font-size: 1.3rem; font-weight: 600;
+  font-family: var(--font-sans);
+}
+
+footer {
+  padding: 3em 1.5em;
+  text-align: center;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: .8rem;
+}
+
+.grid2, .grid3 { display: grid; gap: 1.2em; margin-top: 1.4em; }
+.grid2 { grid-template-columns: repeat(2, 1fr); }
+.grid3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 820px) {
+  .grid2, .grid3 { grid-template-columns: 1fr; }
+}
+
+/* ---------- Navigazione (opzionale) ---------- */
+nav.toc {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--ink); color: var(--paper);
+  display: flex; overflow-x: auto; white-space: nowrap;
+  border-bottom: 3px solid var(--blue);
+}
+nav.toc a {
+  color: var(--paper); text-decoration: none;
+  padding: .85em 1.1em; font-size: .85rem; font-family: var(--font-mono);
+  border-right: 1px solid rgba(255, 255, 255, .12); opacity: .75;
+}
+nav.toc a:hover { opacity: 1; background: rgba(255, 255, 255, .06); }
+nav.toc a span.n { color: var(--blue); margin-right: .5em; }
+
+/* ---------- Titoli di sezione ---------- */
+.kicker {
+  font-family: var(--font-mono);
+  color: var(--blue);
+  font-size: .85rem;
+  display: flex; align-items: center; gap: .6em;
+  margin-bottom: .6em;
+}
+.kicker .num {
+  width: 1.8em; height: 1.8em;
+  border: 1px solid var(--blue); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--blue); font-size: .8rem;
+}
+
+/* ---------- Badge e riquadri di servizio ---------- */
+.badge {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  padding: .25em .6em;
+  border: 1px solid;
+  display: inline-block;
+  vertical-align: middle;
+}
+.badge.onbook { color: var(--teal);  border-color: var(--teal);  background: var(--teal-dim); }
+.badge.extra  { color: var(--amber); border-color: var(--amber); background: var(--amber-dim); }
+
+.legend-box {
+  display: flex; gap: .8em 2em; flex-wrap: wrap; align-items: center;
+  border: 1px solid var(--line); background: #fff;
+  padding: .9em 1.3em; margin: 1.6em 0 0; font-size: .9rem;
+}
+.legend-box .item { display: flex; align-items: center; gap: .6em; }
+
+.teacher-note {
+  border-left: 3px solid var(--teal);
+  background: var(--teal-dim);
+  padding: 1em 1.4em; margin: 1.5em 0; font-size: .95rem;
+}
+.teacher-note strong {
+  color: var(--teal); font-family: var(--font-mono); font-size: .8rem;
+  display: block; margin-bottom: .4em;
+}
+
+.panel {
+  background: #fff; border: 1px solid var(--line);
+  padding: 1.6em 1.8em; margin: 1.6em 0;
+}
+
+.resource {
+  border-left: 3px solid var(--amber);
+  background: var(--amber-dim);
+  padding: 1em 1.3em; margin-bottom: 1em;
+}
+.resource .tag { font-family: var(--font-mono); font-size: .75rem; color: var(--amber); font-weight: 600; }
+
+/* ---------- Pulsanti e form ---------- */
+button {
+  font-family: var(--font-mono); font-size: .85rem;
+  background: var(--ink); color: var(--paper);
+  border: none; padding: .7em 1.3em; cursor: pointer; border-radius: var(--radius);
+}
+button:hover { background: var(--blue); }
+button.secondary { background: none; color: var(--ink); border: 1px solid var(--ink); }
+button.secondary:hover { background: var(--ink); color: var(--paper); }
+button:disabled { opacity: .4; cursor: not-allowed; }
+
+select {
+  font-family: var(--font-mono); padding: .5em; border: 1px solid var(--ink);
+}
+
+/* ---------- Tabelle dati ---------- */
+table {
+  border-collapse: collapse; width: 100%;
+  font-family: var(--font-mono); font-size: .82rem; margin-top: 1em;
+}
+th, td { border: 1px solid var(--line); padding: .4em .6em; text-align: right; }
+th { background: var(--ink); color: var(--paper); font-weight: 500; }
+td:first-child, th:first-child { text-align: center; }
+tbody tr:last-child { background: var(--blue-dim); }
+
+.converged { color: var(--teal); font-family: var(--font-mono); font-size: .85rem; margin-top: .7em; }
+
+/* Tabella di formule */
+.formula-table {
+  width: 100%; border-collapse: collapse; margin: 1.6em 0;
+  font-size: 1.05rem; background: #fff; border: 1px solid var(--line);
+}
+.formula-table th {
+  background: var(--ink); color: var(--paper); text-align: left;
+  padding: .6em .9em; font-family: var(--font-mono); font-size: .8rem; font-weight: 500;
+}
+.formula-table td { padding: 1em .9em; border-top: 1px solid var(--line); vertical-align: middle; text-align: left; }
+.formula-table td:first-child {
+  font-family: var(--font-mono); font-size: .85rem; white-space: nowrap; width: 1%;
+}
+.formula-table td:first-child .sub { display: block; color: var(--ink-soft); font-size: .85em; font-weight: 400; }
+
+/* ---------- Formule in HTML ---------- */
+.formula-line { font-size: 1.1rem; }
+.sqrt { white-space: nowrap; }
+.sqrt .rad-inner { border-top: 1.5px solid currentColor; padding: 0 .12em 0 .04em; }
+
+.frac {
+  display: inline-flex; flex-direction: column; vertical-align: middle;
+  text-align: center; font-size: .85em; line-height: 1.15em;
+  margin: 0 .1em; position: relative; top: .05em;
+}
+.frac .num { border-bottom: 1.3px solid currentColor; padding: 0 .2em; }
+.frac .den { padding: 0 .2em; }
+
+.sigma {
+  position: relative; display: inline-block; font-size: 1.5em;
+  vertical-align: middle; margin: 0 .2em; line-height: 1; top: .08em;
+}
+.sigma .lim-top, .sigma .lim-bot {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: .4em; white-space: nowrap;
+}
+.sigma .lim-top { top: -0.7em; }
+.sigma .lim-bot { bottom: -0.5em; }
+
+.lim {
+  display: inline-flex; flex-direction: column; align-items: center;
+  vertical-align: middle; line-height: 1.15; margin: 0 .3em;
+}
+.lim .lim-sub { font-size: .7em; }
+
+.bullets { max-width: 70ch; padding-left: 1.2em; margin: 0 0 1.4em; }
+.bullets li { margin-bottom: .4em; }
+.bullets .formula-line { margin: .5em 0 .3em; }
+
+/* ---------- Schema a blocchi ---------- */
+.schema {
+  display: flex; align-items: center; gap: .6em; flex-wrap: wrap;
+  margin: 1.8em 0; font-family: var(--font-mono); font-size: .85rem;
+}
+.schema .box { border: 1px solid var(--ink); padding: .9em 1.1em; background: #fff; text-align: center; }
+.schema .box.g1 { background: var(--amber-dim); border-color: var(--amber); }
+.schema .box.g2 { background: var(--teal-dim);  border-color: var(--teal); }
+.schema .arrow { color: var(--blue); font-size: 1.2rem; }
+.schema .approx { font-size: .75rem; width: 100%; line-height: 1.7; }
+.schema .approx .a1 { color: var(--amber); font-weight: 600; display: block; }
+.schema .approx .a2 { color: var(--teal);  font-weight: 600; display: block; }
+@media (max-width: 600px) {
+  .schema { flex-direction: column; align-items: stretch; }
+  .schema .arrow { text-align: center; transform: rotate(90deg); }
+}
+
+/* ---------- Simulazione overflow ---------- */
+.overflow-box { display: flex; gap: 2em; align-items: center; flex-wrap: wrap; }
+.byte-display {
+  font-family: var(--font-mono); font-size: 2.6rem; font-weight: 600;
+  background: var(--ink); color: var(--paper);
+  padding: .4em .7em; min-width: 3.5em; text-align: center;
+  transition: background .15s;
+}
+.byte-display.overflow { background: var(--red); animation: shake .35s; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.bits { display: flex; gap: .25em; margin-top: .7em; }
+.bit {
+  width: 1.6em; height: 1.6em; border: 1px solid var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: .85rem; background: #fff;
+}
+.bit.on { background: var(--blue); color: #fff; }
+.overflow-msg { font-family: var(--font-mono); font-size: .85rem; color: var(--red); min-height: 1.4em; margin-top: .8em; max-width: 42ch; }
+
+/* ---------- Flip card ----------
+   Le due facce occupano la stessa cella di una griglia: l'altezza si adatta
+   alla faccia più alta, quindi il testo non viene mai tagliato.
+   Uso:
+   <div class="flip-card">
+     <div class="flip-inner">
+       <div class="flip-face front"> … </div>
+       <div class="flip-face back"> … </div>
+     </div>
+   </div>                                                              */
+.flip-card { perspective: 1000px; cursor: pointer; min-height: 200px; }
+.flip-card.wide { max-width: 720px; }
+
+.flip-inner {
+  position: relative; width: 100%; height: 100%;
+  display: grid;
+  transition: transform .5s;
+  transform-style: preserve-3d;
+}
+.flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+
+.flip-face {
+  grid-area: 1 / 1;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border: 1px solid var(--line);
+  padding: 1.3em;
+  background: #fff;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.flip-face.back { transform: rotateY(180deg); background: var(--ink); color: var(--paper); font-size: .9rem; }
+.flip-face p { max-width: none; }
+.flip-face .tag { font-family: var(--font-mono); font-size: .75rem; color: var(--blue); }
+.flip-face h3 { margin-top: .3em; }
+.flip-hint { font-family: var(--font-mono); font-size: .7rem; color: var(--ink-soft); margin: .9em 0 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner { transition: none; }
+  .byte-display.overflow { animation: none; }
+}
+
+/* ---------- Slider / controlli (π, bisezione…) ---------- */
+.pi-controls, .bisec-controls {
+  display: flex; align-items: center; gap: 1em; flex-wrap: wrap; margin-bottom: 1em;
+}
+.pi-controls input[type=range] { flex: 1; min-width: 180px; }
+.pi-readouts { display: flex; gap: 1.5em; flex-wrap: wrap; font-family: var(--font-mono); font-size: .85rem; }
+.pi-readouts .val { font-size: 1.15rem; font-weight: 600; }
+.leg { display: inline-flex; align-items: center; gap: .4em; }
+.dot { width: .7em; height: .7em; border-radius: 50%; display: inline-block; }
+
+/* ---------- Quiz ---------- */
+.quiz-q { border: 1px solid var(--line); background: #fff; padding: 1.3em 1.5em; margin-bottom: 1.2em; }
+.quiz-q p.qtext { font-weight: 600; margin-bottom: .8em; }
+.quiz-q label { display: block; padding: .4em 0; cursor: pointer; font-size: .95rem; }
+.quiz-feedback { margin-top: .8em; font-family: var(--font-mono); font-size: .85rem; padding: .6em; display: none; }
+.quiz-feedback.ok { background: var(--teal-dim); color: var(--teal); display: block; }
+.quiz-feedback.ko { background: var(--red-dim);  color: var(--red);  display: block; }
+
+/* ---------- Simulazione propagazione dell'errore ---------- */
+.sim-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .8em 1.6em; margin-bottom: 1em; font-family: var(--font-mono); font-size: .85rem; }
+.sim-controls label { display: inline-flex; align-items: center; gap: .6em; }
+.sim-controls input[type=number] { font-family: var(--font-mono); font-size: .95rem; width: 7.5em; padding: .4em .5em; border: 1px solid var(--ink); background: #fff; }
+.sim-controls input[type=range] { width: 200px; max-width: 100%; }
+.sim-controls b { min-width: 1.6em; font-size: 1rem; }
+.chips { display: inline-flex; gap: .4em; align-items: center; flex-wrap: wrap; }
+.chips button { padding: .35em .8em; font-size: .8rem; }
+.sim-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: .6em; margin-bottom: 1.2em; }
+.sim-buttons select { font-size: .85rem; }
+
+.sim-readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .8em; margin-bottom: .8em; }
+.sim-cell { border: 1px solid var(--line); background: var(--paper); padding: .6em .8em; min-width: 0; }
+.sim-cell .lbl { font-family: var(--font-mono); font-size: .7rem; color: var(--ink-soft); display: block; }
+.sim-cell .v { font-family: var(--font-mono); font-size: 1rem; font-weight: 600; word-break: break-all; }
+.sim-cell.bad  { background: var(--red-dim);  border-color: var(--red);  color: var(--red); }
+.sim-cell.good { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
+.sim-msg { min-height: 3em; font-size: .95rem; margin: 0 0 1em; max-width: none; }
+
+.sim-cap { font-family: var(--font-mono); font-size: .8rem; margin: 1.2em 0 .3em; color: var(--ink); }
+.sim-cap small { color: var(--ink-soft); }
+.sim-chart svg { width: 100%; height: auto; display: block; background: #fff; border: 1px solid var(--line); }
+.sim-legend { display: flex; flex-wrap: wrap; gap: .4em 1.2em; font-family: var(--font-mono); font-size: .75rem; color: var(--ink-soft); margin-top: .5em; }
+.sim-legend i { display: inline-block; width: 1.4em; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: .4em; }
+
+svg .c-grid  { stroke: var(--line); stroke-width: 1; }
+svg .c-text  { font: 12px var(--font-mono); fill: var(--ink-soft); }
+svg .c-div   { stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 2 4; }
+svg .c-floor { stroke: var(--red); stroke-width: 1.2; stroke-dasharray: 6 4; }
+svg .c-floor-t { fill: var(--red); }
+svg .c-ideal { fill: none; stroke: #9aa3b5; stroke-width: 1.6; stroke-dasharray: 5 4; }
+svg .c-down  { fill: none; stroke: var(--blue);  stroke-width: 2.5; }
+svg .c-up    { fill: none; stroke: var(--amber); stroke-width: 2.5; }
+svg .c-dot-down { fill: var(--blue); }
+svg .c-dot-up   { fill: var(--amber); }
+svg .c-down-t { fill: var(--blue); font-weight: 600; }
+svg .c-up-t   { fill: var(--amber); font-weight: 600; }
+svg .c-now   { fill: var(--ink); stroke: #fff; stroke-width: 2; }
+svg .c-now.lost { fill: var(--red); }
+svg .c-err   { fill: var(--ink); cursor: pointer; }
+svg .c-zero  { fill: #fff; stroke: var(--teal); stroke-width: 1.8; cursor: pointer; }
+svg .c-ok-t  { fill: var(--teal); }
+svg .c-ring  { fill: none; stroke: var(--blue); stroke-width: 2.2; }
+@media (max-width: 600px) {
+  svg .c-text { font-size: 17px; }
+}
