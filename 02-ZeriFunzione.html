@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeri di una funzione: bisezione e Newton</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <link href="stile.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <header class="hero">
+        <div class="inner">
+            <div class="eyebrow">Modulo B — Unità B1</div>
+            <h1>Trovare gli zeri di una funzione</h1>
+            <p class="sub">Bisezione e metodo di Newton: due modi per avvicinarsi a una soluzione.</p>
+            <div class="legend-box">
+                <div class="item">Sul libro <span class="badge onbook">Pagg. 129–132</span></div>
+                <div class="item">Materiale extra <span class="badge extra">File notebook 06_Bisezione.ipynb</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1 ------------------------------------------------------------ -->
+    <section id="perche">
+        <div class="inner">
+            <div class="kicker"><span class="num">1</span>Perché un metodo iterativo?</div>
+            <h2>Non basta una formula?</h2>
+
+            <div class="grid2">
+                <div class="flip-card">
+                    <div class="flip-inner">
+                        <div class="flip-face front">
+                            <span class="tag">GRADO ALTO</span>
+                            <h3>Un polinomio di grado 5 o più…</h3>
+                            <p class="flip-hint">↻ clicca per girare</p>
+                        </div>
+                        <div class="flip-face back">
+                            <p style="margin:0">Le formule risolutive esistono solo fino al quarto grado. Per i gradi
+                                superiori non esiste una formula generale.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-inner">
+                        <div class="flip-face front">
+                            <span class="tag">NESSUNA FORMULA</span>
+                            <h3>cos(x) − x = 0</h3>
+                            <p class="flip-hint">↻ clicca per girare</p>
+                        </div>
+                        <div class="flip-face back">
+                            <p style="margin:0">Per equazioni come questa non esiste nessuna formula algebrica: l'unica
+                                strada è approssimare la soluzione.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-inner">
+                        <div class="flip-face front">
+                            <span class="tag">SOLUZIONE IRRAZIONALE</span>
+                            <h3>x² − 2 = 0</h3>
+                            <p class="flip-hint">↻ clicca per girare</p>
+                        </div>
+                        <div class="flip-face back">
+                            <p style="margin:0">La formula c'è, ma la soluzione è <span class="sqrt">√<span
+                                        class="rad-inner">2</span></span>, un numero irrazionale: il computer può solo
+                                approssimarla.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-inner">
+                        <div class="flip-face front">
+                            <span class="tag">QUANDO MI FERMO?</span>
+                            <h3>Un metodo iterativo non finisce mai…</h3>
+                            <p class="flip-hint">↻ clicca per girare</p>
+                        </div>
+                        <div class="flip-face back">
+                            <p style="margin:0">…ma ci si può fermare quando l'errore scende sotto la soglia richiesta.
+                                In più si applica a moltissime funzioni.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2 ------------------------------------------------------------ -->
+    <section id="metodi" class="alt">
+        <div class="inner">
+            <div class="kicker"><span class="num">2</span>Due metodi a confronto</div>
+            <h2>Bisezione e Newton in azione</h2>
+
+            <div class="grid2">
+                <div class="panel" style="margin:0">
+                    <span class="badge onbook">Bisezione</span>
+                    <p class="formula-line" style="margin:.8em 0 .3em">
+                        m = <span class="frac"><span class="num">a + b</span><span class="den">2</span></span>
+                    </p>
+                    <p style="margin:0;font-size:.95rem">Dimezza [a, b] e tiene la metà in cui f cambia segno.</p>
+                </div>
+                <div class="panel" style="margin:0">
+                    <span class="badge extra">Newton (tangenti)</span>
+                    <p class="formula-line" style="margin:.8em 0 .3em">
+                        x<sub>n+1</sub> = x<sub>n</sub> − <span class="frac"><span
+                                class="num">f(x<sub>n</sub>)</span><span class="den">f′(x<sub>n</sub>)</span></span>
+                    </p>
+                    <p style="margin:0;font-size:.95rem">Segue la tangente fino all'asse x per “saltare” verso lo zero.
+                    </p>
+                </div>
+            </div>
+
+            <div class="panel" data-zeri-demo data-funzioni="f1,f2,f3,f4,f5,f6">
+                <div class="bisec-controls">
+                    <select data-func aria-label="Funzione"></select>
+                    <label><input type="radio" data-method value="bisezione" checked> Bisezione</label>
+                    <label><input type="radio" data-method value="newton"> Newton (tangenti)</label>
+                </div>
+                <p class="zeri-hint" data-hint></p>
+                <div class="bisec-controls">
+                    <button data-step>Esegui un passo</button>
+                    <button class="secondary" data-auto>▶ Auto</button>
+                    <button class="secondary" data-reset>Ricomincia</button>
+                </div>
+                <canvas data-canvas role="img" aria-label="Grafico della funzione e dei passi del metodo"></canvas>
+                <p class="zeri-hint" data-clickhint hidden>👆 Newton: clicca sul grafico per scegliere il punto di
+                    partenza x₀.</p>
+                <div class="table-scroll">
+                    <table>
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="converged" data-msg></div>
+            </div>
+
+            <div class="teacher-note"><strong>Verifica le ipotesi</strong>La bisezione richiede che f sia continua e che
+                f(a) e f(b)
+                abbiano segno opposto (teorema degli zeri). Nel codice si controlla con un <code>assert</code>.</div>
+            <div class="teacher-note"><strong>Newton vs bisezione</strong>Newton è molto più veloce perché sfrutta la
+                pendenza
+                f′(x), ma richiede una funzione derivabile e un punto di partenza “abbastanza buono”: non converge
+                sempre.</div>
+            <div class="resource"><span class="tag">DA FARE</span><br>Usa il file notebook di Classroom per scrivere il
+                codice del metodo di bisezione.</div>
+        </div>
+    </section>
+
+
+    <footer>Materiale didattico basato su "Hashtag 3", Modulo B, Unità B1 — Calcolo numerico e algebra lineare ·
+        Realizzato con l'assistenza di Claude (Anthropic)</footer>
+
+    <script src="funzioni.js"></script>
+</body>
+
+</html>

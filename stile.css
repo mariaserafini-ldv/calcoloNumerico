@@ -393,3 +393,12 @@ svg .c-ring  { fill: none; stroke: var(--blue); stroke-width: 2.2; }
 @media (max-width: 600px) {
   svg .c-text { font-size: 17px; }
 }
+
+/* ---------- Zeri di una funzione (grafico + tabella) ---------- */
+.bisec-controls label { font-family: var(--font-mono); font-size: .85rem; display: inline-flex; align-items: center; gap: .4em; }
+.panel canvas { width: 100%; display: block; border: 1px solid var(--line); background: #fff; }
+.zeri-hint { font-size: .9rem; color: var(--ink-soft); margin: .3em 0 1em; max-width: none; min-height: 1.4em; }
+.table-scroll { max-height: 260px; overflow: auto; border: 1px solid var(--line); margin-top: 1em; }
+.table-scroll table { margin-top: 0; }
+.table-scroll thead th { position: sticky; top: 0; }
+.converged.fail { color: var(--red); }

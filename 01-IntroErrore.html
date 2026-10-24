@@ -7,7 +7,9 @@
   <title>Calcolo numerico ed errore</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet">
   <link href="stile.css" rel="stylesheet">
 </head>
 
@@ -19,7 +21,8 @@
       <h1>Calcolo numerico: dal problema reale al risultato approssimato</h1>
       <div class="legend-box">
         <div class="item">Sul libro <span class="badge onbook">Pagg. 124–126</span></div>
-        <div class="item">Materiale extra <span class="badge extra">File notebook (.ipynb)</span></div>
+        <div class="item">Materiale extra <span class="badge extra">File notebook 04_Errore.ipynb</span>
+        </div>
       </div>
     </div>
   </header>
@@ -47,13 +50,18 @@
         <div class="flip-inner">
           <div class="flip-face front">
             <span class="tag">PROVA A RISPONDERE</span>
-            <p style="margin:.7em 0 0">Un termometro digitale che mostra 21.5°C sta dando un valore esatto o approssimato?</p>
-            <p style="margin:.9em 0 0">E un contatore di popolazione descritto da una funzione continua, sta descrivendo la realtà in modo esatto o approssimato?</p>
+            <p style="margin:.7em 0 0">Un termometro digitale che mostra 21.5°C sta dando un valore esatto o
+              approssimato?</p>
+            <p style="margin:.9em 0 0">E un contatore di popolazione descritto da una funzione continua, sta descrivendo
+              la realtà in modo esatto o approssimato?</p>
             <p class="flip-hint">↻ clicca per vedere la risposta</p>
           </div>
           <div class="flip-face back">
-            <p style="margin:0 0 .8em 0"><strong>Termometro:</strong> valore approssimato — la temperatura reale varia con continuità, ma lo strumento la arrotonda a una cifra decimale (approssimazione nella misura).</p>
-            <p style="margin:0"><strong>Popolazione:</strong> anche qui approssimato. Le persone si contano a interi (1, 2, 3…), mai a "2,7 persone": la realtà è <em>discreta</em>. Descriverla con una funzione continua è una semplificazione — è esattamente il passaggio "Situazione reale → Modello matematico".</p>
+            <p style="margin:0 0 .8em 0"><strong>Termometro:</strong> valore approssimato — la temperatura reale varia
+              con continuità, ma lo strumento la arrotonda a una cifra decimale (approssimazione nella misura).</p>
+            <p style="margin:0"><strong>Popolazione:</strong> anche qui approssimato. Le persone si contano a interi (1,
+              2, 3…), mai a "2,7 persone": la realtà è <em>discreta</em>. Descriverla con una funzione continua è una
+              semplificazione — è esattamente il passaggio "Situazione reale → Modello matematico".</p>
           </div>
         </div>
       </div>
@@ -69,7 +77,8 @@
         non genera un errore ma "gira" silenziosamente e riparte dal valore più basso — è l'aritmetica circolare (la
         stessa logica del <strong>complemento a due</strong>,
         <a href="https://infodoc.altervista.org/esercizi-risolti-conversioni-binario-ottale-esadecimale-con-spiegazione/numeri-relativi-rappresentazione-in-modulo-e-segno-e-in-complemento-a-2/"
-          target="_blank" rel="noopener">che trovi spiegato qui ↗</a> se sei curioso).</p>
+          target="_blank" rel="noopener">che trovi spiegato qui ↗</a> se sei curioso).
+      </p>
 
       <div class="panel">
         <div class="overflow-box" data-overflow-demo data-bits="8">
@@ -90,7 +99,8 @@
         nuovo razzo Ariane 5, che si autodistrusse 40 secondi dopo il decollo dal centro spaziale di Kourou. Puoi vedere
         il filmato originale del lancio (e dell'esplosione) sul sito dell'ESA:
         <a href="https://www.esa.int/ESA_Multimedia/Videos/1996/06/Ariane_501_recording_launch_pad_before_and_at_launch"
-          target="_blank" rel="noopener">Ariane 501 — registrazione del lancio ↗</a>.</p>
+          target="_blank" rel="noopener">Ariane 501 — registrazione del lancio ↗</a>.
+      </p>
 
       <div class="teacher-note"><strong>Da notare</strong>Il bug non era "matematico" ma di <em>rappresentazione</em>:
         il calcolo era corretto, il contenitore era troppo piccolo.</div>
@@ -112,7 +122,8 @@
               <p class="flip-hint">↻ clicca per girare</p>
             </div>
             <div class="flip-face back">
-              <p style="margin:0">Calcolano la soluzione in un numero prevedibile e finito di passi. Esempio: la formula risolutiva di un'equazione di secondo grado.</p>
+              <p style="margin:0">Calcolano la soluzione in un numero prevedibile e finito di passi. Esempio: la formula
+                risolutiva di un'equazione di secondo grado.</p>
             </div>
           </div>
         </div>
@@ -125,7 +136,8 @@
               <p class="flip-hint">↻ clicca per girare</p>
             </div>
             <div class="flip-face back">
-              <p style="margin:0">Partono da valori iniziali e convergono passo dopo passo verso la soluzione. L'approssimazione dipende da quando ci si ferma. Esempio: le serie di Leibniz e Nilakantha per π.</p>
+              <p style="margin:0">Partono da valori iniziali e convergono passo dopo passo verso la soluzione.
+                L'approssimazione dipende da quando ci si ferma. Esempio: le serie di Leibniz e Nilakantha per π.</p>
             </div>
           </div>
         </div>
@@ -138,7 +150,8 @@
               <p class="flip-hint">↻ clicca per girare</p>
             </div>
             <div class="flip-face back">
-              <p style="margin:0">Calcolano valori sempre più vicini alla soluzione tramite una funzione che richiama se stessa.</p>
+              <p style="margin:0">Calcolano valori sempre più vicini alla soluzione tramite una funzione che richiama se
+                stessa.</p>
             </div>
           </div>
         </div>
@@ -181,11 +194,13 @@
           <div class="sim-cell"><span class="lbl">fase · passo</span><span class="v" data-out="phase">—</span></div>
           <div class="sim-cell"><span class="lbl">valore attuale</span><span class="v" data-out="value">—</span></div>
           <div class="sim-cell"><span class="lbl">distanza da 1</span><span class="v" data-out="dist">—</span></div>
-          <div class="sim-cell"><span class="lbl">errore relativo finale</span><span class="v" data-out="err">—</span></div>
+          <div class="sim-cell"><span class="lbl">errore relativo finale</span><span class="v" data-out="err">—</span>
+          </div>
         </div>
         <p class="sim-msg" data-msg></p>
 
-        <div class="sim-cap">① Quanto manca a 1 dopo ogni passo <small>(scala logaritmica · asse orizzontale: passi)</small></div>
+        <div class="sim-cap">① Quanto manca a 1 dopo ogni passo <small>(scala logaritmica · asse orizzontale:
+            passi)</small></div>
         <div class="sim-chart"><svg data-chart-delta role="img" aria-label="Distanza da 1 passo dopo passo"></svg></div>
         <div class="sim-legend">
           <span><i style="border-color:#9aa3b5;border-top-style:dashed"></i>matematica esatta</span>
@@ -193,13 +208,17 @@
           <span><i style="border-color:var(--amber)"></i>computer: quadrati</span>
         </div>
 
-        <div class="sim-cap">② Errore relativo finale al variare di n <small>(asse orizzontale: n · clicca un punto per provarlo · ○ = nessun errore)</small></div>
+        <div class="sim-cap">② Errore relativo finale al variare di n <small>(asse orizzontale: n · clicca un punto per
+            provarlo · ○ = nessun errore)</small></div>
         <div class="sim-chart"><svg data-chart-err role="img" aria-label="Errore relativo in funzione di n"></svg></div>
       </div>
 
-      <div class="teacher-note"><strong>Da notare</strong>Il computer ha circa 16 cifre significative: quando la distanza da 1 scende sotto la soglia rossa, il numero viene arrotondato a 1.0 esatto — e nessun quadrato può più ricostruire <em>x</em>.</div>
+      <div class="teacher-note"><strong>Da notare</strong>Il computer ha circa 16 cifre significative: quando la
+        distanza da 1 scende sotto la soglia rossa, il numero viene arrotondato a 1.0 esatto — e nessun quadrato può più
+        ricostruire <em>x</em>.</div>
 
-      <div class="resource"><span class="tag">DA FARE</span><br>Usa il file notebook di Classroom per scrivere il codice di questa simulazione.</div>
+      <div class="resource"><span class="tag">DA FARE</span><br>Usa il file notebook di Classroom per scrivere il codice
+        di questa simulazione.</div>
     </div>
   </section>
 

@@ -309,6 +309,272 @@ function initPropagaDemos(root = document) {
 }
 
 /* ---------------------------------------------------------------------
+   5. ZERI DI UNA FUNZIONE: BISEZIONE E NEWTON
+   Markup: vedi 02-ZeriFunzione.html (attributo data-zeri-demo).
+   Per aggiungere una funzione basta una riga in ZERI_FUNZIONI:
+     fn = funzione, df = derivata, [a, b] = intervallo, x0 = partenza di Newton
+     (default: punto medio), ylim = [ymin, ymax] (opzionale), hint = suggerimento.
+   Con data-funzioni="f1,f4" sul contenitore si sceglie quali mostrare.
+   --------------------------------------------------------------------- */
+const ZERI_FUNZIONI = {
+  f1: { label: 'f(x) = x² − 2', fn: x => x * x - 2, df: x => 2 * x, a: 1, b: 2,
+        hint: 'Lo zero di f è √2 ≈ 1,41421.' },
+  f2: { label: 'f(x) = x³ − x − 2', fn: x => x * x * x - x - 2, df: x => 3 * x * x - 1, a: 1, b: 2,
+        hint: 'Equazione di terzo grado: la formula esiste, ma è complicata. Qui basta un metodo iterativo.' },
+  f3: { label: 'f(x) = cos(x) − x', fn: x => Math.cos(x) - x, df: x => -Math.sin(x) - 1, a: 0, b: 1,
+        hint: 'Nessuna formula algebrica risolve cos(x) = x: servono i metodi numerici.' },
+  f4: { label: 'f(x) = 3ˣ + 3x − 5', fn: x => Math.pow(3, x) + 3 * x - 5, df: x => Math.log(3) * Math.pow(3, x) + 3, a: 0, b: 1,
+        hint: 'Esponenziale + retta: nessuna formula risolutiva elementare. Per i metodi iterativi non è un problema.' },
+  f5: { label: 'f(x) = x³ − 2x + 2', fn: x => x * x * x - 2 * x + 2, df: x => 3 * x * x - 2, a: -2, b: 1, x0: 0,
+        hint: 'Prova Newton: parte da x₀ = 0 e… osserva cosa succede. Poi clicca sul grafico per partire da un altro punto.' },
+  f6: { label: 'f(x) = 1/x', fn: x => 1 / x, df: x => -1 / (x * x), a: -1, b: 2, ylim: [-6, 6],
+        hint: 'f cambia segno in [−1, 2], ma non è continua. Cosa trova la bisezione?' }
+};
+
+let _zeriCounter = 0;
+function initZeriDemos(root = document) {
+  root.querySelectorAll('[data-zeri-demo]').forEach(box => {
+    const $ = s => box.querySelector(s);
+    const select = $('[data-func]'), stepBtn = $('[data-step]'), autoBtn = $('[data-auto]'), resetBtn = $('[data-reset]');
+    const canvas = $('[data-canvas]'), ctx = canvas.getContext('2d');
+    const thead = $('thead'), tbody = $('tbody'), msg = $('[data-msg]');
+    const hintEl = $('[data-hint]'), clickHint = $('[data-clickhint]');
+    const radios = box.querySelectorAll('[data-method]');
+    const id = ++_zeriCounter;
+    radios.forEach(r => r.name = 'metodo' + id);
+
+    const keys = (box.dataset.funzioni || Object.keys(ZERI_FUNZIONI).join(',')).split(',').map(s => s.trim());
+    keys.forEach(k => select.add(new Option(`${ZERI_FUNZIONI[k].label}  ·  [${ZERI_FUNZIONI[k].a}, ${ZERI_FUNZIONI[k].b}]`, k)));
+
+    const TOL = 1e-4, MAXIT = 20, MARGIN = 0.06;
+    const SUBS = '₀₁₂₃₄₅₆₇₈₉';
+    const sub = n => String(n).split('').map(d => SUBS[d]).join('');
+    const method = () => [...radios].find(r => r.checked).value;
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    function niceTicks(min, max, target) {
+      const raw = (max - min) / target, mag = Math.pow(10, Math.floor(Math.log10(raw))), norm = raw / mag;
+      const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag, out = [];
+      for (let i = Math.ceil(min / step - 1e-9); i * step <= max + 1e-9; i++) out.push(+(i * step).toFixed(10));
+      return { ticks: out, dec: Math.min(6, Math.max(0, -Math.floor(Math.log10(step) + 1e-9))) };
+    }
+
+    let state, view = null, customX0 = null, animToken = 0, autoToken = 0;
+
+    function setMsg(text, fail) { msg.textContent = text; msg.className = 'converged' + (fail ? ' fail' : ''); }
+
+    function reset(keepX0) {
+      animToken++; autoToken++; autoBtn.textContent = '▶ Auto';
+      if (!keepX0) customX0 = null;
+      const def = ZERI_FUNZIONI[select.value], m = method();
+      if (m === 'bisezione') {
+        state = { def, method: m, a: def.a, b: def.b, iter: 0, done: false, m: null };
+        thead.innerHTML = '<tr><th>#</th><th>a</th><th>b</th><th>m</th><th>f(m)</th><th>b−a</th></tr>';
+      } else {
+        const x0 = customX0 !== null ? customX0 : (def.x0 !== undefined ? def.x0 : (def.a + def.b) / 2);
+        state = { def, method: m, x: x0, iter: 0, done: false, hist: [] };
+        thead.innerHTML = "<tr><th>#</th><th>x</th><th>f(x)</th><th>f'(x)</th><th>x nuovo</th></tr>";
+      }
+      tbody.innerHTML = ''; setMsg('');
+      hintEl.textContent = def.hint || '';
+      clickHint.hidden = (m !== 'newton');
+      canvas.style.cursor = m === 'newton' ? 'crosshair' : 'default';
+      stepBtn.disabled = false;
+      draw();
+    }
+
+    function draw(info, t) {
+      const { def } = state;
+      const w = Math.max(280, canvas.clientWidth || 900), h = Math.max(240, Math.round(w * 0.4));
+      const dpr = window.devicePixelRatio || 1;
+      if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+        canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); canvas.style.height = h + 'px';
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const padL = 48, padR = 16, padT = 16, padB = 18;
+      ctx.clearRect(0, 0, w, h);
+      const span = def.b - def.a, x0 = def.a - MARGIN * span, x1 = def.b + MARGIN * span;
+      const N = 240, ys = []; let yMin = Infinity, yMax = -Infinity;
+      for (let i = 0; i <= N; i++) {
+        const y = def.fn(x0 + (x1 - x0) * i / N); ys.push(y);
+        if (isFinite(y)) { yMin = Math.min(yMin, y); yMax = Math.max(yMax, y); }
+      }
+      if (def.ylim) { [yMin, yMax] = def.ylim; }
+      else { const pad = (yMax - yMin) * 0.12 || 1; yMin -= pad; yMax += pad; }
+      view = { x0, x1, padL, padR };
+      const xToPx = x => padL + (x - x0) / (x1 - x0) * (w - padL - padR);
+      const yToPx = y => padT + (1 - (y - yMin) / (yMax - yMin)) * (h - padT - padB);
+      const axisY = Math.min(h - padB, Math.max(padT, yToPx(0)));
+
+      function label(text, x, y, color, align) {
+        ctx.save(); ctx.font = '11px "IBM Plex Mono", monospace'; ctx.textAlign = align || 'center';
+        ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(255,255,255,.92)';
+        ctx.strokeText(text, x, y); ctx.fillStyle = color || '#4a5468'; ctx.fillText(text, x, y); ctx.restore();
+      }
+      const tx = niceTicks(x0, x1, w < 500 ? 5 : 8), ty = niceTicks(yMin, yMax, 5);
+      ctx.lineWidth = 1; ctx.strokeStyle = '#eeebe1';
+      tx.ticks.forEach(v => { const p = xToPx(v); ctx.beginPath(); ctx.moveTo(p, padT); ctx.lineTo(p, h - padB); ctx.stroke(); });
+      ty.ticks.forEach(v => { const p = yToPx(v); ctx.beginPath(); ctx.moveTo(padL, p); ctx.lineTo(w - padR, p); ctx.stroke(); });
+
+      ctx.strokeStyle = '#4a5468'; ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB); ctx.stroke();
+      ty.ticks.forEach(v => { const p = yToPx(v); ctx.beginPath(); ctx.moveTo(padL - 4, p); ctx.lineTo(padL, p); ctx.stroke();
+        label(v.toFixed(ty.dec), padL - 7, p + 4, '#4a5468', 'right'); });
+      ctx.beginPath(); ctx.moveTo(padL, axisY); ctx.lineTo(w - padR, axisY); ctx.stroke();
+      const below = axisY + 15 < h - 2;
+      tx.ticks.forEach(v => { const p = xToPx(v); ctx.beginPath(); ctx.moveTo(p, axisY - 4); ctx.lineTo(p, axisY + 4); ctx.stroke();
+        label(v.toFixed(tx.dec), p, below ? axisY + 16 : axisY - 8, '#4a5468'); });
+      label('x', w - padR - 6, axisY - 8, '#4a5468', 'right');
+
+      ctx.save();
+      ctx.beginPath(); ctx.rect(padL, padT, w - padL - padR, h - padT - padB); ctx.clip();
+      if (state.method === 'bisezione') {        // fascia dell'intervallo [a, b] corrente
+        ctx.fillStyle = 'rgba(47,111,237,.09)';
+        ctx.fillRect(xToPx(state.a), padT, xToPx(state.b) - xToPx(state.a), h - padT - padB);
+      }
+      // curva (interrotta dove la funzione "salta")
+      ctx.strokeStyle = '#15213b'; ctx.lineWidth = 2; ctx.setLineDash([]); ctx.beginPath();
+      let pen = false;
+      for (let i = 0; i <= N; i++) {
+        const y = ys[i];
+        if (!isFinite(y)) { pen = false; continue; }
+        const px = xToPx(x0 + (x1 - x0) * i / N), py = yToPx(y);
+        if (pen && Math.abs(y - ys[i - 1]) > (yMax - yMin)) pen = false;
+        if (pen) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+        pen = true;
+      }
+      ctx.stroke();
+
+      const dot = (x, y, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(xToPx(x), yToPx(y), 5, 0, 7); ctx.fill(); };
+      const seg = (xa, ya, xb, yb, c, lw, dash) => {
+        ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.setLineDash(dash || []);
+        ctx.beginPath(); ctx.moveTo(xToPx(xa), yToPx(ya)); ctx.lineTo(xToPx(xb), yToPx(yb)); ctx.stroke(); ctx.setLineDash([]);
+      };
+
+      if (state.method === 'bisezione') {
+        [[state.a, '#2f6fed', 'a'], [state.b, '#c4432c', 'b'], [state.m, '#d98c1f', 'm']].forEach(([x, c, l]) => {
+          if (x === null) return;
+          dot(x, def.fn(x), c); label(l, xToPx(x), yToPx(def.fn(x)) - 10, '#15213b');
+        });
+        ctx.restore(); return;
+      }
+
+      const hist = state.hist;
+      hist.forEach((hh, k) => {
+        const last = (k === hist.length - 1) && !info;
+        seg(hh.x, 0, hh.x, hh.fx, 'rgba(47,111,237,.35)', 1, [4, 3]);
+        seg(x0, hh.fx + hh.dfx * (x0 - hh.x), x1, hh.fx + hh.dfx * (x1 - hh.x), last ? '#d98c1f' : 'rgba(217,140,31,.35)', last ? 2 : 1.3);
+        if (last) dot(hh.xNew, 0, '#d98c1f');
+      });
+      const cx = state.x, cy = def.fn(cx);
+      seg(cx, 0, cx, cy, 'rgba(47,111,237,.7)', 1.3, [4, 3]);
+      if (info) {
+        const tA = Math.min(1, t / 0.6), tB = Math.max(0, (t - 0.6) / 0.4);
+        const L = (info.x - x0) * tA, R = (x1 - info.x) * tA;
+        seg(info.x - L, info.fx - info.dfx * L, info.x + R, info.fx + info.dfx * R, '#d98c1f', 2.2);
+        if (tA >= 1) {
+          dot(info.xNew, 0, '#d98c1f');
+          seg(info.xNew, 0, info.xNew, info.fNew * tB, 'rgba(47,111,237,.7)', 1.3, [4, 3]);
+          if (tB >= 1) dot(info.xNew, info.fNew, '#2f6fed');
+        }
+      }
+      dot(cx, cy, '#2f6fed');
+      ctx.restore();
+
+      const pts = hist.map(hh => hh.x).concat([state.x]), drawn = [];
+      for (let k = pts.length - 1; k >= 0; k--) {
+        const px = xToPx(pts[k]);
+        if (drawn.some(q => Math.abs(q - px) < 22)) continue;
+        label('x' + sub(k), px + 2, yToPx(def.fn(pts[k])) - 12, '#2f6fed'); drawn.push(px);
+      }
+    }
+
+    function addRow(cells) {
+      const row = document.createElement('tr');
+      row.innerHTML = cells.map(c => `<td>${c}</td>`).join('');
+      tbody.appendChild(row);
+      tbody.parentNode.parentNode.scrollTop = 1e6;
+    }
+
+    function stepBisection() {
+      const { def } = state; let { a, b } = state;
+      const m = (a + b) / 2, fm = def.fn(m);
+      state.iter++;
+      addRow([state.iter, a.toFixed(6), b.toFixed(6), m.toFixed(6), fm.toFixed(6), (b - a).toFixed(6)]);
+      if (Math.abs(fm) < 1e-9 || (b - a) < TOL || state.iter >= MAXIT) {
+        state.done = true; state.m = m; stepBtn.disabled = true;
+        if (Math.abs(fm) > 1e-2) setMsg(`⚠ L'intervallo è minuscolo ma f(m) = ${fm.toFixed(2)} è lontano da 0: qui non c'è nessuno zero! (f non è continua in [a, b])`, true);
+        else setMsg(`✓ Convergenza raggiunta in ${state.iter} passi — zero stimato in x ≈ ${m.toFixed(6)}`);
+      } else {
+        if (def.fn(a) * fm < 0) b = m; else a = m;
+        state.a = a; state.b = b; state.m = m;
+      }
+      draw();
+      return Promise.resolve();
+    }
+
+    function stepNewton() {
+      return new Promise(resolve => {
+        const { def } = state, x = state.x, fx = def.fn(x), dfx = def.df(x);
+        const stop = (text, fail) => { state.done = true; stepBtn.disabled = true; setMsg(text, fail); draw(); resolve(); };
+        if (dfx === 0) return stop('⚠ Tangente orizzontale: il metodo non può proseguire da qui.', true);
+        const xNew = x - fx / dfx;
+        if (!isFinite(xNew)) return stop('⚠ Il metodo è uscito dal dominio della funzione.', true);
+        const info = { x, fx, dfx, xNew, fNew: def.fn(xNew) };
+        const token = ++animToken, DUR = 1300, start = performance.now();
+        stepBtn.disabled = true;
+        function frame(now) {
+          if (token !== animToken) { resolve(); return; }
+          const t = Math.min(1, (now - start) / DUR);
+          draw(info, t);
+          if (t < 1) { requestAnimationFrame(frame); return; }
+          state.hist.push(info); state.x = xNew; state.iter++;
+          addRow([state.iter, x.toFixed(6), fx.toFixed(6), dfx.toFixed(6), xNew.toFixed(6)]);
+          if (Math.abs(info.fNew) < 1e-9) {
+            state.done = true; setMsg(`✓ Convergenza raggiunta in ${state.iter} passi — zero stimato in x ≈ ${xNew.toFixed(6)}`);
+          } else if (state.iter >= MAXIT) {
+            state.done = true; setMsg(`✗ Dopo ${MAXIT} passi non si è raggiunto nessuno zero: da questo punto di partenza Newton non converge. Prova un altro x₀!`, true);
+          }
+          stepBtn.disabled = state.done; draw(); resolve();
+        }
+        requestAnimationFrame(frame);
+      });
+    }
+
+    const step = () => state.done ? Promise.resolve() : (state.method === 'bisezione' ? stepBisection() : stepNewton());
+
+    async function runAuto() {
+      const my = ++autoToken; autoBtn.textContent = '⏸ Pausa';
+      while (!state.done && my === autoToken) {
+        await step();
+        if (my !== autoToken) return;
+        await sleep(state.method === 'bisezione' ? 550 : 300);
+      }
+      if (my === autoToken) autoBtn.textContent = '▶ Auto';
+    }
+
+    select.addEventListener('change', () => reset(false));
+    radios.forEach(r => r.addEventListener('change', () => reset(true)));
+    stepBtn.addEventListener('click', () => { autoToken++; autoBtn.textContent = '▶ Auto'; step(); });
+    autoBtn.addEventListener('click', () => {
+      if (autoBtn.textContent.startsWith('⏸')) { autoToken++; autoBtn.textContent = '▶ Auto'; }
+      else if (!state.done) runAuto();
+    });
+    resetBtn.addEventListener('click', () => reset(true));
+    canvas.addEventListener('click', ev => {         // Newton: si sceglie x₀ cliccando sul grafico
+      if (state.method !== 'newton' || !view) return;
+      const r = canvas.getBoundingClientRect(), w = r.width;
+      const x = view.x0 + (ev.clientX - r.left - view.padL) / (w - view.padL - view.padR) * (view.x1 - view.x0);
+      const lo = state.def.a, hi = state.def.b;
+      customX0 = Math.min(hi, Math.max(lo, x));
+      reset(true);
+    });
+    window.addEventListener('resize', () => draw());
+    reset(false);
+  });
+}
+
+/* ---------------------------------------------------------------------
    Avvio automatico
    --------------------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -316,4 +582,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initOverflowDemos();
   initQuizzes();
   initPropagaDemos();
+  initZeriDemos();
 });
