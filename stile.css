@@ -402,3 +402,10 @@ svg .c-ring  { fill: none; stroke: var(--blue); stroke-width: 2.2; }
 .table-scroll table { margin-top: 0; }
 .table-scroll thead th { position: sticky; top: 0; }
 .converged.fail { color: var(--red); }
+
+/* ---------- Approssimazione di π ---------- */
+.panel canvas.canvas-square { width: min(100%, 420px); margin: 0 auto; }
+.pi-readouts.center { justify-content: center; }
+.pi-note { text-align: center; font-size: .9rem; color: var(--ink-soft); margin: .7em auto 0; max-width: none; }
+.pi-history { font-family: var(--font-mono); font-size: .8rem; color: var(--ink-soft); text-align: center; margin: .5em 0 0; }
+.formula-table tbody tr:last-child { background: transparent; }

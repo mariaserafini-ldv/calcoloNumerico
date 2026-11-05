@@ -575,6 +575,181 @@ function initZeriDemos(root = document) {
 }
 
 /* ---------------------------------------------------------------------
+   6. APPROSSIMAZIONE DI π  (Archimede, serie di Leibniz/Nilakantha, Monte Carlo)
+   Markup: vedi 03-Pigreco.html (data-archimede-demo, data-serie-demo, data-montecarlo-pi).
+   --------------------------------------------------------------------- */
+
+/* Adatta un <canvas> alla larghezza reale (nitido anche su telefono).
+   Restituisce il contesto 2D e la dimensione "logica" (pixel CSS). */
+function fitCanvas(canvas, aspect) {
+  const w = Math.max(240, canvas.clientWidth || 600), h = Math.round(w * aspect);
+  const dpr = window.devicePixelRatio || 1;
+  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); canvas.style.height = h + 'px';
+  }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  return { ctx, w, h };
+}
+
+/* ---- Archimede: poligoni inscritti e circoscritti ---- */
+function initArchimedeDemos(root = document) {
+  root.querySelectorAll('[data-archimede-demo]').forEach(box => {
+    const $ = s => box.querySelector(s);
+    const slider = $('[data-slider]'), sidesVal = $('[data-sidesval]'), canvas = $('[data-canvas]');
+    const inVal = $('[data-in]'), outVal = $('[data-out]'), interval = $('[data-interval]');
+
+    function update() {
+      const n = parseInt(slider.value, 10);
+      sidesVal.textContent = n;
+      const { ctx, w, h } = fitCanvas(canvas, 1);
+      const cx = w / 2, cy = h / 2, R = w * 0.4;
+      ctx.strokeStyle = '#15213b'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, 2 * Math.PI); ctx.stroke();
+      const poly = (radius, offset, color) => {
+        ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+        for (let k = 0; k <= n; k++) {
+          const a = offset + k * 2 * Math.PI / n, x = cx + radius * Math.sin(a), y = cy - radius * Math.cos(a);
+          if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath(); ctx.stroke();
+      };
+      poly(R, 0, '#2f6fed');                              // inscritto
+      poly(R / Math.cos(Math.PI / n), Math.PI / n, '#c4432c');   // circoscritto
+      const lo = n * Math.sin(Math.PI / n), hi = n * Math.tan(Math.PI / n);
+      inVal.textContent = lo.toFixed(5); outVal.textContent = hi.toFixed(5);
+      interval.innerHTML = `${lo.toFixed(5)} &lt; π &lt; ${hi.toFixed(5)}`;
+    }
+    slider.addEventListener('input', update);
+    box.querySelectorAll('[data-preset]').forEach(b =>
+      b.addEventListener('click', () => { slider.value = b.dataset.preset; update(); }));
+    window.addEventListener('resize', update);
+    update();
+  });
+}
+
+/* ---- Confronto di convergenza: Leibniz, Nilakantha, Monte Carlo ----
+   Due viste sullo stesso grafico: "valori" (le stime) ed "errore" (scala log).
+   Elementi opzionali: [data-mc] (lettura Monte Carlo), [data-regen] (nuovi punti),
+   [data-view="valori|errore"] (pulsanti di vista).                                 */
+function initSerieDemos(root = document) {
+  root.querySelectorAll('[data-serie-demo]').forEach(box => {
+    const $ = s => box.querySelector(s);
+    const slider = $('[data-slider]'), nVal = $('[data-nval]'), canvas = $('[data-canvas]');
+    const leibEl = $('[data-leibniz]'), nilaEl = $('[data-nila]'), mcEl = $('[data-mc]'), regen = $('[data-regen]');
+    const viewBtns = box.querySelectorAll('[data-view]');
+    const MAXN = parseInt(slider.max, 10) || 80;
+    const COL = { leib: '#2f6fed', nila: '#c4432c', mc: '#1f8f7d' };
+
+    const leib = []; { let t = 0; for (let i = 0; i < MAXN; i++) { t += Math.pow(-1, i) / (2 * i + 1); leib.push(4 * t); } }
+    const nila = []; { let t = 0, s = 1; for (let i = 1; i <= MAXN; i++) { t += s / (i * (i + 1) * (2 * i + 1)); nila.push(3 + t); s = -s; } }
+    let mc = [], view = 'valori';
+    function genMC() {                                   // stima Monte Carlo "in corso": dopo i punti lanciati
+      mc = []; let d = 0;
+      for (let i = 1; i <= MAXN; i++) { if (Math.pow(Math.random(), 2) + Math.pow(Math.random(), 2) <= 1) d++; mc.push(4 * d / i); }
+    }
+
+    function update() {
+      const n = parseInt(slider.value, 10);
+      nVal.textContent = n;
+      const { ctx, w, h } = fitCanvas(canvas, 0.4);
+      const padL = 46, padR = 16, padT = 14, padB = 26;
+      const isErr = (view === 'errore');
+      ctx.font = '11px "IBM Plex Mono", monospace'; ctx.lineWidth = 1;
+
+      // assi: x lineare (valori) oppure logaritmico (errore)
+      const X = isErr ? i => padL + Math.log(i + 1) / Math.log(MAXN) * (w - padL - padR)
+                      : i => padL + i / (MAXN - 1) * (w - padL - padR);
+      const yMin = 2.6, yMax = 4.0, lTop = 0.5, lBot = -9;
+      const Y = isErr ? v => padT + (lTop - Math.log10(Math.max(v, 1e-9))) / (lTop - lBot) * (h - padT - padB)
+                      : v => padT + (1 - (Math.max(yMin, Math.min(yMax, v)) - yMin) / (yMax - yMin)) * (h - padT - padB);
+      const val = (arr, i) => isErr ? Math.abs(arr[i] - Math.PI) : arr[i];
+
+      ctx.textAlign = 'right';
+      if (isErr) {
+        for (let e = 0; e >= -8; e -= 2) {
+          ctx.strokeStyle = '#e5e1d4'; ctx.beginPath(); ctx.moveTo(padL, Y(Math.pow(10, e))); ctx.lineTo(w - padR, Y(Math.pow(10, e))); ctx.stroke();
+          ctx.fillStyle = '#4a5468'; ctx.fillText(e === 0 ? '1' : '1e' + e, padL - 6, Y(Math.pow(10, e)) + 4);
+        }
+      } else {
+        for (let v = 2.6; v <= 4.0001; v += 0.2) {
+          ctx.strokeStyle = '#e5e1d4'; ctx.beginPath(); ctx.moveTo(padL, Y(v)); ctx.lineTo(w - padR, Y(v)); ctx.stroke();
+          ctx.fillStyle = '#4a5468'; ctx.fillText(v.toFixed(1), padL - 6, Y(v) + 4);
+        }
+        ctx.strokeStyle = '#15213b'; ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.moveTo(padL, Y(Math.PI)); ctx.lineTo(w - padR, Y(Math.PI)); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = '#15213b'; ctx.fillText('π', w - padR, Y(Math.PI) - 5);
+      }
+      ctx.textAlign = 'center'; ctx.fillStyle = '#4a5468';
+      const xt = isErr ? [1, 10, 100, MAXN] : [1, MAXN / 4, MAXN / 2, 3 * MAXN / 4, MAXN];
+      [...new Set(xt)].forEach(t => { if (t <= MAXN) ctx.fillText(Math.round(t), X(Math.round(t) - 1), h - 8); });
+
+      const draw = (arr, color, lw) => {
+        ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.beginPath();
+        for (let i = 0; i < n; i++) { const x = X(i), y = Y(val(arr, i)); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+        ctx.stroke();
+        ctx.fillStyle = color; ctx.beginPath(); ctx.arc(X(n - 1), Y(val(arr, n - 1)), 4, 0, 7); ctx.fill();
+      };
+      if (mcEl) draw(mc, COL.mc, 1.4);
+      draw(leib, COL.leib, 2); draw(nila, COL.nila, 2);
+
+      const fmt = v => v.toFixed(6) + '  (err ' + Math.abs(v - Math.PI).toExponential(2) + ')';
+      leibEl.textContent = fmt(leib[n - 1]); nilaEl.textContent = fmt(nila[n - 1]);
+      if (mcEl) mcEl.textContent = fmt(mc[n - 1]);
+      viewBtns.forEach(b => b.classList.toggle('secondary', b.dataset.view !== view));
+    }
+    genMC();
+    slider.addEventListener('input', update);
+    if (regen) regen.addEventListener('click', () => { genMC(); update(); });
+    viewBtns.forEach(b => b.addEventListener('click', () => { view = b.dataset.view; update(); }));
+    window.addEventListener('resize', update);
+    update();
+  });
+}
+
+/* ---- Monte Carlo: stima di π con punti casuali ---- */
+function initMonteCarloPi(root = document) {
+  root.querySelectorAll('[data-montecarlo-pi]').forEach(box => {
+    const $ = s => box.querySelector(s);
+    const slider = $('[data-slider]'), nVal = $('[data-nval]'), canvas = $('[data-canvas]');
+    const estEl = $('[data-est]'), errEl = $('[data-err]'), inEl = $('[data-dentro]'), histEl = $('[data-history]');
+    let history = [], lastN = null;
+
+    function run(newPoints) {
+      const N = parseInt(slider.value, 10);
+      nVal.textContent = N;
+      const { ctx, w, h } = fitCanvas(canvas, 1);
+      const pad = 24, side = w - 2 * pad;
+      const toX = v => pad + v * side, toY = v => h - pad - v * side;
+      ctx.strokeStyle = '#15213b'; ctx.lineWidth = 1; ctx.strokeRect(pad, pad, side, side);
+      ctx.strokeStyle = '#c4432c'; ctx.lineWidth = 1.8; ctx.beginPath();
+      ctx.arc(toX(0), toY(0), side, -Math.PI / 2, 0); ctx.stroke();
+      let dentro = 0;
+      for (let i = 0; i < N; i++) {
+        const x = Math.random(), y = Math.random(), isIn = x * x + y * y <= 1;
+        if (isIn) dentro++;
+        ctx.fillStyle = isIn ? '#1f8f7d' : '#2f6fed';
+        ctx.beginPath(); ctx.arc(toX(x), toY(y), 1.7, 0, 7); ctx.fill();
+      }
+      const stima = 4 * dentro / N;
+      estEl.textContent = stima.toFixed(5);
+      errEl.textContent = Math.abs(stima - Math.PI).toExponential(2);
+      inEl.textContent = `${dentro} / ${N}`;
+      if (lastN !== N) history = [];              // se cambia N, la cronologia riparte
+      lastN = N; history.unshift(stima.toFixed(4)); history = history.slice(0, 6);
+      histEl.textContent = history.join('  ·  ');
+    }
+    slider.addEventListener('input', () => run());
+    $('[data-run]').addEventListener('click', () => run());
+    box.querySelectorAll('[data-preset]').forEach(b =>
+      b.addEventListener('click', () => { slider.value = b.dataset.preset; run(); }));
+    window.addEventListener('resize', () => run());
+    run();
+  });
+}
+
+/* ---------------------------------------------------------------------
    Avvio automatico
    --------------------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -583,4 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initQuizzes();
   initPropagaDemos();
   initZeriDemos();
+  initArchimedeDemos();
+  initSerieDemos();
+  initMonteCarloPi();
 });

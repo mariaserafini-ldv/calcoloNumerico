@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approssimazione di π</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet">
+  <link href="stile.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <header class="hero">
+    <div class="inner">
+      <div class="eyebrow">Modulo B — Unità B1</div>
+      <h1>Approssimazione di π</h1>
+      <p class="sub">Tre strade per stimare π: poligoni, serie numeriche, numeri casuali.</p>
+      <div class="legend-box">
+        <div class="item">Sul libro <span class="badge onbook">Pagg. 93-95, 126–129</span></div>
+        <div class="item">Materiale extra <span class="badge extra">File notebook 08_Pigreco.ipynb</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 ------------------------------------------------------------ -->
+  <section id="archimede">
+    <div class="inner">
+      <div class="kicker"><span class="num">1</span>Il metodo geometrico di Archimede <span class="badge onbook">Sul
+          libro · pp. 126-127</span></div>
+      <h2>Intrappolare π tra due poligoni</h2>
+      <div class="flip-card wide">
+        <div class="flip-inner">
+          <div class="flip-face front">
+            <span class="tag">PROVA A RISPONDERE</span>
+            <p style="margin:.7em 0 0">Archimede non conosceva né il simbolo π né la formula C = 2πr. Come fa a
+              calcolare π?</p>
+            <p class="flip-hint">↻ clicca per vedere la risposta</p>
+          </div>
+          <div class="flip-face back">
+            <p style="margin:0">Non lo “usa”: lo <strong>cerca</strong>. Sapeva che il rapporto circonferenza/diametro è
+              lo stesso per tutti i cerchi, e lo racchiude tra i perimetri di un poligono <strong>inscritto</strong> e
+              di uno <strong>circoscritto</strong>.</p>
+          </div>
+        </div>
+      </div>
+      <p>Si racchiude la circonferenza tra due poligoni regolari con lo stesso numero di lati: uno inscritto e uno
+        circoscritto.
+        Si parte da un esagono. </p>
+
+      <div class="schema">
+        <div class="box g1">esagono<br>6 lati</div>
+        <div class="arrow">→</div>
+        <div class="box g1">12 lati</div>
+        <div class="arrow">→</div>
+        <div class="box g1">24 lati</div>
+        <div class="arrow">→</div>
+        <div class="box g1">48 lati</div>
+        <div class="arrow">→</div>
+        <div class="box g2">96 lati<br>(Archimede si fermò qui)</div>
+      </div>
+
+
+      Indicando con <span class="num">d</span> il diametro, con <span class="num">p<sub>n</sub></span> il perimetro del
+      poligono inscritto e con <span class="num">P<sub>n</sub></span> quello del circoscritto (entrambi con n lati):
+      <p class="formula-line" style="margin:1.4em 0 .2em">
+        <span class="frac"><span class="num">p<sub>n</sub></span><span class="den">d</span></span> &lt; π &lt;
+        <span class="frac"><span class="num">P<sub>n</sub></span><span class="den">d</span></span>
+      </p>
+
+      <div class="panel" data-archimede-demo>
+        <div class="pi-controls">
+          <span class="mono">lati = </span>
+          <input type="range" data-slider min="6" max="120" value="6" step="1" aria-label="Numero di lati">
+          <span class="mono" data-sidesval>6</span>
+          <span class="chips">
+            <button class="secondary" data-preset="6">6</button>
+            <button class="secondary" data-preset="12">12</button>
+            <button class="secondary" data-preset="24">24</button>
+            <button class="secondary" data-preset="48">48</button>
+            <button class="secondary" data-preset="96">96</button>
+          </span>
+        </div>
+        <canvas class="canvas-square" data-canvas role="img"
+          aria-label="Cerchio tra poligono inscritto e circoscritto"></canvas>
+        <div class="pi-readouts center" style="margin-top:1em">
+          <span class="leg"><span class="dot" style="background:#2f6fed"></span>Inscritto (per difetto)</span>
+          <span class="val mono" data-in>3.00000</span>
+          <span class="leg"><span class="dot" style="background:#c4432c"></span>Circoscritto (per eccesso)</span>
+          <span class="val mono" data-out>3.46410</span>
+        </div>
+        <p class="pi-note" data-interval>3.00000 &lt; π &lt; 3.46410</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ------------------------------------------------------------ -->
+  <section id="serie" class="alt">
+    <div class="inner">
+      <div class="kicker"><span class="num">2</span>Le serie di Leibniz e Nilakantha <span class="badge onbook">Sul
+          libro · pp. 127-129</span></div>
+      <h2>π come somma infinita</h2>
+      <p>Niente più poligoni: a ogni passo si aggiunge un termine e ci si avvicina a π. Anche queste due formule sono
+        metodi iterativi, ma invece di poligoni sommano termini numerici: a ogni passo aggiungono un termine e si
+        avvicinano al valore vero di π.</p>
+
+      <table class="formula-table">
+        <thead>
+          <tr>
+            <th>Formula</th>
+            <th>Espressione</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Leibniz<span class="sub">(o Gregory-Leibniz)</span></td>
+            <td>
+              <span class="frac"><span class="num">π</span><span class="den">4</span></span> =
+              <span class="sigma">Σ<span class="lim-top">∞</span><span class="lim-bot">i=0</span></span>
+              <span class="frac"><span class="num">(−1)<sup>i</sup></span><span class="den">2i+1</span></span>
+              = 1 − <span class="frac"><span class="num">1</span><span class="den">3</span></span> + <span
+                class="frac"><span class="num">1</span><span class="den">5</span></span> − <span class="frac"><span
+                  class="num">1</span><span class="den">7</span></span> + <span class="frac"><span
+                  class="num">1</span><span class="den">9</span></span> − <span class="frac"><span
+                  class="num">1</span><span class="den">11</span></span> …
+            </td>
+          </tr>
+          <tr>
+            <td>Nilakantha</td>
+            <td>
+              π − 3 =
+              <span class="sigma">Σ<span class="lim-top">∞</span><span class="lim-bot">i=1</span></span>
+              <span class="frac"><span class="num">(−1)<sup>i−1</sup></span><span
+                  class="den">i·(i+1)·(2i+1)</span></span>
+              = <span class="frac"><span class="num">1</span><span class="den">1·2·3</span></span> − <span
+                class="frac"><span class="num">1</span><span class="den">2·3·5</span></span> + <span class="frac"><span
+                  class="num">1</span><span class="den">3·4·7</span></span> …
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3 ------------------------------------------------------------ -->
+  <section id="montecarlo">
+    <div class="inner">
+      <div class="kicker"><span class="num">3</span>Monte Carlo: far “piovere” punti a caso
+        <span class="badge onbook">Sul libro · pp. 93-94</span>
+      </div>
+      <h2>Quando il caso diventa un algoritmo</h2>
+      <p>Si lanciano punti a caso nel quadrato di lato 1 e si conta quanti cadono nel quarto di cerchio.</p>
+
+      <p class="formula-line" style="margin:.8em 0 1.2em">
+        π ≈ 4 · <span class="frac"><span class="num">punti dentro</span><span class="den">N</span></span>
+      </p>
+
+      <div class="panel" data-montecarlo-pi>
+        <div class="pi-controls">
+          <span class="mono">N punti = </span>
+          <input type="range" data-slider min="10" max="4000" value="500" aria-label="Numero di punti">
+          <span class="mono" data-nval>500</span>
+          <button data-run>Genera nuovi punti</button>
+        </div>
+        <div class="chips" style="margin-bottom:1em">prova con:
+          <button class="secondary" data-preset="100">100</button>
+          <button class="secondary" data-preset="1000">1000</button>
+          <button class="secondary" data-preset="4000">4000</button>
+        </div>
+        <canvas class="canvas-square" data-canvas role="img" aria-label="Punti casuali nel quadrato unitario"></canvas>
+        <div class="pi-readouts center" style="margin-top:1em">
+          <span class="leg"><span class="dot" style="background:#1f8f7d"></span>dentro</span><span class="val mono"
+            data-dentro>—</span>
+          <span class="leg">Stima di π</span><span class="val mono" data-est>—</span>
+          <span class="leg">Errore</span><span class="val mono" data-err>—</span>
+        </div>
+        <p class="pi-history">ultime stime: <span data-history></span></p>
+      </div>
+
+      <div class="teacher-note"><strong>Perché moltiplicare per 4?</strong>L'area del quarto di cerchio è π/4 e quella
+        del quadrato è 1:
+        la frazione di punti “dentro” stima proprio π/4. Premi più volte “Genera nuovi punti”: la stima cambia a ogni
+        lancio, ma con N grande oscilla meno.</div>
+
+    </div>
+  </section>
+
+  <!-- 4 ------------------------------------------------------------ -->
+  <section id="confronto" class="alt">
+    <div class="inner">
+      <div class="kicker"><span class="num">4</span>Confronto di convergenza</div>
+      <h2>Chi si avvicina prima a π?</h2>
+      <p>Stesso n per tutti: n termini per le serie, n punti lanciati per Monte Carlo. Passa alla vista
+        <strong>errore</strong> per vedere chi scende più in fretta.
+      </p>
+
+      <div class="panel" data-serie-demo>
+        <div class="pi-controls">
+          <span class="mono">n = </span>
+          <input type="range" data-slider min="1" max="200" value="20" aria-label="Numero di termini o di punti">
+          <span class="mono" data-nval>20</span>
+        </div>
+        <div class="chips" style="margin-bottom:1em">vista:
+          <button data-view="valori">Valori</button>
+          <button class="secondary" data-view="errore">Errore (scala log)</button>
+          <button class="secondary" data-regen>Nuovi punti Monte Carlo</button>
+        </div>
+        <canvas data-canvas role="img" aria-label="Confronto di convergenza verso π"></canvas>
+        <div class="pi-readouts" style="margin-top:1em">
+          <span class="leg"><span class="dot" style="background:#2f6fed"></span>Leibniz</span>
+          <span class="val mono" data-leibniz>—</span>
+          <span class="leg"><span class="dot" style="background:#c4432c"></span>Nilakantha</span>
+          <span class="val mono" data-nila>—</span>
+          <span class="leg"><span class="dot" style="background:#1f8f7d"></span>Monte Carlo</span>
+          <span class="val mono" data-mc>—</span>
+          <span class="leg">π reale</span>
+          <span class="val mono">3.14159265…</span>
+        </div>
+      </div>
+
+      <div class="flip-card wide">
+        <div class="flip-inner">
+          <div class="flip-face front">
+            <span class="tag">PROVA A RISPONDERE</span>
+            <p style="margin:.7em 0 0">Nella vista “errore” Nilakantha scende molto più in fretta di Leibniz, mentre
+              Monte Carlo è irregolare e lenta.</p>
+            <p style="margin:.9em 0 0">Perché?</p>
+            <p class="flip-hint">↻ clicca per vedere la risposta</p>
+          </div>
+          <div class="flip-face back">
+            <p style="margin:0 0 .8em 0"><strong>Serie:</strong> il denominatore di Nilakantha cresce come
+              <strong>2i³</strong>, quello di Leibniz solo come <strong>2i</strong>: ogni nuovo termine è molto più
+              piccolo e pesa meno sulla somma. È la <em>velocità di convergenza</em>.
+            </p>
+            <p style="margin:0"><strong>Monte Carlo:</strong> l'errore è casuale e scende solo come 1/√N: per guadagnare
+              una cifra decimale servono 100 volte più punti.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource" style="margin-top:1.6em"><span class="tag">DA FARE</span><br>Usa il file notebook di
+        Classroom per scrivere il codice di queste approssimazioni di π.</div>
+    </div>
+  </section>
+
+  <!-- 5 ------------------------------------------------------------ -->
+  <section id="prova">
+    <div class="inner">
+      <div class="kicker"><span class="num">5</span>Mettiti alla prova</div>
+
+      <div class="quiz-q" data-correct="b">
+        <p class="qtext">Con il poligono di Archimede, π si trova…</p>
+        <label><input type="radio" name="q1" value="a"> esattamente sul perimetro del poligono inscritto</label>
+        <label><input type="radio" name="q1" value="b"> tra il rapporto p<sub>n</sub>/d e il rapporto
+          P<sub>n</sub>/d</label>
+        <label><input type="radio" name="q1" value="c"> sempre sopra il rapporto P<sub>n</sub>/d</label>
+        <div class="quiz-feedback" data-ok="Esatto! E con più lati l'intervallo si stringe sempre di più."
+          data-ko="Guarda la simulazione: π resta sempre compreso tra i due valori."></div>
+      </div>
+
+      <div class="quiz-q" data-correct="a">
+        <p class="qtext">Nel Monte Carlo, i punti dentro al quarto di cerchio su N stimano…</p>
+        <label><input type="radio" name="q2" value="a"> π/4: per questo la stima si moltiplica per 4</label>
+        <label><input type="radio" name="q2" value="b"> π: non serve moltiplicare</label>
+        <label><input type="radio" name="q2" value="c"> 4π</label>
+        <div class="quiz-feedback" data-ok="Esatto! Area del quarto di cerchio / area del quadrato = π/4."
+          data-ko="Area del quarto di cerchio (r = 1) = π/4; area del quadrato = 1."></div>
+      </div>
+
+      <div class="quiz-q" data-correct="b">
+        <p class="qtext">Premi due volte “Genera nuovi punti” con lo stesso N. Ottieni la stessa stima?</p>
+        <label><input type="radio" name="q3" value="a"> Sì, con lo stesso N il risultato è sempre uguale</label>
+        <label><input type="radio" name="q3" value="b"> No: i punti sono casuali, quindi la stima cambia a ogni
+          lancio</label>
+        <div class="quiz-feedback"
+          data-ok="Esatto! A differenza di Leibniz e Nilakantha, qui il risultato è casuale: con N grande le stime restano più vicine tra loro."
+          data-ko="Prova: guarda la riga “ultime stime”."></div>
+      </div>
+      <div class="quiz-q" data-correct="b">
+        <p class="qtext">Per ridurre di circa 10 volte l'errore di Monte Carlo servono…</p>
+        <label><input type="radio" name="q4" value="a"> circa 10 volte più punti</label>
+        <label><input type="radio" name="q4" value="b"> circa 100 volte più punti</label>
+        <label><input type="radio" name="q4" value="c"> circa 1000 volte più punti</label>
+        <div class="quiz-feedback"
+          data-ok="Esatto! L'errore scende come 1/√N: 100 volte più punti → 10 volte meno errore."
+          data-ko="Nella vista “errore” la linea verde scende come 1/√N."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Materiale didattico basato su "Hashtag 3", Modulo B, Unità B1 — Calcolo numerico e algebra lineare ·
+    Realizzato con l'assistenza di Claude (Anthropic)</footer>
+
+  <script src="funzioni.js"></script>
+</body>
+
+</html>
